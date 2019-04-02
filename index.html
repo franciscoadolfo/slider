@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style>
+	*{
+		margin: 0;
+		border: 0;
+		padding: 0;
+	}
+	html{
+		height: 100%;
+		width: 100%;
+	}
+	div#slider-main{
+		display: flex;
+		align-items: center;
+		overflow: hidden;
+		line-height: 0px;
+		background: #000;
+	}
+		div#slider-main span.direccion{
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: absolute;
+			width: 1.5em;
+			height: 1.5em;
+			font-size: 2em;
+			border-radius: 1.5em;
+			cursor: pointer;
+			color: #FFF;
+			background: rgba(0,0,0,.5);
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-khtml-user-select: none;
+			-ms-user-select:none;
+			opacity: 0;
+		}
+		div#slider-main div#desplazamiento{
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: absolute;
+			width: 100%;
+		}
+			div#slider-main div#desplazamiento span.item-pointer{
+				width: 1em;
+				height: 1em;
+				border-radius: 1em;
+				opacity: 0;
+				background: rgba(255,255,255,.3);
+				margin:0 5px;
+				cursor: pointer;
+			}
+			div#slider-main span#left{
+				left: 0;
+				margin-left: 20px;
+			}
+			div#slider-main span#right{
+				right: 0;
+				margin-right: 20px;
+			}		
+		div#slider-main div#images{
+			display: flex;
+		}
+			div#slider-main div#images div.item, 
+				div#slider-main div#images div.item img{
+				cursor: pointer;
+				min-width: 100%;
+				width: 100%;
+				max-width: 100%;
+			}
+</style>
+<body>
+	<div id="slider-main">		
+		<div id="images">
+			<div class="item">
+				<img src="img/slide-1.jpg">
+			</div>
+			<div class="item">
+				<img src="img/slide-2.jpg">
+			</div>
+			<div class="item">
+				<img src="img/slide-3.jpg">
+			</div>
+			<div class="item">
+				<img src="img/slide-4.jpg">
+			</div>
+			<div class="item">
+				<img src="img/slide-5.jpg">
+			</div>
+		</div>
+		<div id="desplazamiento">	
+		</div>
+		<span class="direccion" id="left" onclick="izquierda()"> < </span>
+		<span class="direccion" id="right" onclick="derecha()"> > </span>
+		
+	</div>
+</body>
+<script>
+	var imagenes = document.querySelectorAll('div#slider-main div#images div.item img'),
+		totalImagenes = imagenes.length,
+		posicion = 0,
+		segundos = 0;
+
+	$(document).ready(function() {
+		$('#images').css('transition-duration','.5s');
+		temporizador(3)
+		let html = '';
+		for (let i = 0; i < totalImagenes; i++)
+			html += '<span class="item-pointer" onclick="clickItemPointer('+i+')"></span>';
+		hover();
+		document.querySelector('#desplazamiento').innerHTML = html;
+		document.querySelectorAll('.item-pointer')[0].style.background = 'rgba(0,0,0,.5)';
+	});
+
+	$(window).resize(function() {
+		mover();
+	});
+
+	function hover(){
+		let slider = document.querySelector('div#slider-main');
+		slider.addEventListener("mouseout", () => {
+			$('.item-pointer').css({'opacity':'0','transition-duration':'.5s'});
+			$('.direccion').css({'opacity':'0','transition-duration':'.5s'});
+		});
+		slider.addEventListener("mouseover", () => {
+			$('.item-pointer').css({'opacity':'1','transition-duration':'.5s'});
+			$('.direccion').css({'opacity':'1','transition-duration':'.5s'});
+		});
+	}
+
+	function temporizador(tiempo){
+		window.setInterval(function(){
+			segundos++;
+			if (segundos == tiempo){
+				posicion++;
+				posicion = posicion < totalImagenes ? posicion : 0;
+				mover();
+			}
+		},1000);
+	}
+
+	function derecha(){
+		posicion++;
+		if(posicion >= totalImagenes)
+			posicion = 0;
+		mover();
+	}
+
+	function izquierda(){
+		posicion--;
+		if (posicion == -1)
+			posicion = totalImagenes - 1;
+		mover();
+	}
+
+	function mover(){
+		segundos = 0;
+		let width = imagenes[0].offsetWidth;
+		for (let i = 0; i < totalImagenes; i++)
+			if(i != posicion)	
+				document.querySelectorAll('.item-pointer')[i].style.background = 'rgba(255,255,255,.3)';
+			else
+				document.querySelectorAll('.item-pointer')[i].style.background = 'rgba(0,0,0,.5)';
+		$('#images').css('transform','translate(-'+(width*posicion)+'px,0)');
+	}
+
+	function clickItemPointer(indice){
+		posicion = indice;
+		mover();
+	}
+</script>
+</html>
